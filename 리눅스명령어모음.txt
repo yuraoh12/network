@@ -1,0 +1,230 @@
+리눅스 버전확인
+cat /etc/redhat-release
+세팅 메뉴얼
+/etc/selinux/config
+
+SELINUX=disabled
+재부팅(reboot)
+리포지터리 리스트 확인
+
+yum repolist
+epel 리포지터리 추가
+
+yum install epel-release
+현재 설치된 모든 yum 프로그램을 일괄 업데이트
+
+yum update -y
+중요한 보안이슈를 케어하기 위해서
+메인계정 만들기
+
+useradd devel
+passwd devel
+ftp, vim, mlocate, bind-tuils 설치
+
+sudo yum install vim mlocate bind-utils -y
+bind-utils는 nslookup 명령어 때문에 설치
+updatedb
+
+mlocate가 모든 파일정보DB를 다시 읽게 하기
+하루에 한번 자동으로 읽는다.
+devel에 sudo 권한 주기
+
+vim /etc/sudoers
+root ALL=(ALL) ALL # 밑에
+devel ALL=(ALL) ALL # 추가
+저장시 꼭 wq! 로 저장
+nginx 설치 및 활성화
+
+yum install nginx
+systemctl enable nginx
+systemctl restart nginx
+vim /etc/nginx/nginx.conf
+아래 코드를 include /etc/nginx/conf.d/*.conf; 위에 추가
+client_header_timeout 20m;
+client_body_timeout 20m;
+client_max_body_size 1024M;
+proxy_connect_timeout 600;
+proxy_send_timeout 600;
+proxy_read_timeout 600;
+send_timeout 600;
+proxy_buffers 16 16k;
+proxy_buffer_size 32k;
+fastcgi_buffers 16 16k;
+fastcgi_buffer_size 32k;
+large_client_header_buffers 4 512k;
+php_vhost.conf.include 설정파일 생성
+
+sudo vim /etc/nginx/conf.d/php_vhost.conf.include
+index index.php index.html index.htm;
+root $documentRoot;
+
+location ~ .php$ {
+root $documentRoot;
+fastcgi_pass 127.0.0.1:9000;
+fastcgi_index index.php;
+fastcgi_param SCRIPT_FILENAME $documentRoot/$fastcgi_script_name;
+include /etc/nginx/fastcgi_params;
+fastcgi_read_timeout 600;
+}
+```
+
+vhost.conf 설정파일 생성
+vim /etc/nginx/conf.d/vhost.conf
+server {
+listen 80;
+server_name www.fishingvillain.com;
+rewrite ^ http://fishingvillain.com$request_uri? permanent;
+}
+
+server {
+listen 80;
+server_name fishingvillain.com;
+
+set $documentRoot /web/fishingvillain/public;
+
+location / {
+    try_files $uri $uri/ /index.php?$args;
+}
+
+include /etc/nginx/conf.d/php_vhost.conf.include;
+}
+
+server {
+listen 80;
+server_name www.hello-koboso.fun koboso.oa.gg;
+rewrite ^ http://hello-koboso.fun$request_uri? permanent;
+}
+
+server {
+listen 80;
+server_name hello-koboso.fun;
+
+set $documentRoot /web/hello-koboso/public;
+
+location / {
+    try_files $uri $uri/ /index.php?$args;
+}
+
+include /etc/nginx/conf.d/php_vhost.conf.include;
+}
+```
+
+웹 디렉토리 폴더 만들기
+
+mkdir -p /web/fishingvillain/public
+mkdir -p /web/hello-koboso/public
+chown devel:devel /web/fishingvillain -R
+chown devel:devel /web/hello-koboso -R
+mariadb 설치 및 활성화
+
+vim /etc/yum.repos.d/MariaDB.repo
+[mariadb]
+name = MariaDB
+baseurl = http://yum.mariadb.org/10.1/centos7-amd64
+gpgkey=https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
+gpgcheck=1
+```
+
+yum install MariaDB-server MariaDB-client -y
+vim /etc/my.cnf.d/server.cnf
+[mysqld]
+collation-server = utf8_unicode_ci
+init-connect='SET NAMES utf8'
+character-set-server = utf8
+```
+
+systemctl enable mariadb
+
+systemctl restart mariadb
+
+mysql_secure_installation
+
+mysql -u root -p
+
+grant all privileges on . to 관리자 계정 ID@% identified by '관리용 계정 비번';
+
+grant all privileges on pureftpd.* to pureftpd@localhost identified by 'pureftpd가 사용할 DB접속 비번';
+
+grant all privileges on site1.* to site1@localhost identified by '비번';
+
+grant all privileges on site2.* to site1@localhost identified by '비번';
+
+revoke all privileges on site2.* from site2@localhost;
+
+grant all privileges on site2.* to site2@localhost identified by '비번';
+
+pure-ftpd 설치 및 활성화
+
+yum install pure-ftpd -y
+vim /etc/pure-ftpd/pure-ftpd.conf
+MYSQLSocket /var/lib/mysql/mysql.sock
+mysql 소켓 파일 확인은 mysql이 돌아가고 있는 상태에서 updatedb 명령 후 locate mysql | fgrep sock
+MaxClientsNumber 10배 이상 늘리기
+MaxClientsPerIP 100배 이상 늘리기
+MySQLConfigFile /etc/pure-ftpd/pureftpd-mysql.conf # 주석 풀기
+vim /etc/pure-ftpd/pureftpd-mysql.conf
+MYSQLUser pureftpd # pure-ftpd 에서 mysql 에 접속할 때 사용할 ID
+MYSQLPassword pureftpd # pure-ftpd 에서 mysql 에 접속할 때 사용할 PW
+MYSQLDatabase pureftpd가 사용할 DB접속 비번 # ftp 사용자 정보 DB
+MYSQLCrypt cleartext # 비번은 평문으로 저장 하겠다.
+아래 쿼리문 실행
+아래 코드에서 1001은 devel 계정의 계정번호로 대체
+계정번호 확인은 vim /etc/passwd 에서
+DROP DATABASE IF EXISTS pureftpd;
+
+CREATE DATABASE pureftpd;
+
+USE pureftpd;
+
+CREATE TABLE users (
+uidx int(10) unsigned NOT NULL AUTO_INCREMENT,
+user varchar(100) NOT NULL,
+password varchar(100) NOT NULL,
+gid int(10) unsigned NOT NULL,
+uid int(10) unsigned NOT NULL,
+occurDate timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+status tinyint(1) unsigned NOT NULL DEFAULT '1',
+ipaccess varchar(15) NOT NULL,
+comment varchar(100) NOT NULL,
+ulBandWidth smallint(5) unsigned NOT NULL,
+dlBandWidth smallint(5) unsigned NOT NULL,
+quotaSize smallint(5) unsigned NOT NULL,
+quotaFiles int(10) unsigned NOT NULL,
+dir varchar(100) NOT NULL,
+PRIMARY KEY (uidx)
+);
+
+insert into users(uidx,user,password,gid,uid,occurDate,status,ipaccess,comment,ulBandWidth,dlBandWidth,quotaSize,quotaFiles,dir) values
+(1,'fishingvillain','비번',1001,1001,NOW(),1,'','',0,0,0,0,'/web/fishingvillain/public'),
+(2,'hello-koboso','비번',1001,1001,NOW(),1,'','',0,0,0,0,'/web/hello-koboso/public');
+
+- sudo systemctl enable pure-ftpd
+- sudo systemctl restart pure-ftpd
+
+- php 설치 및 세팅
+- sudo yum install epel-release
+- sudo rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm
+- sudo yum install php72w php72w-devel php72w-mysqlnd php72w-fpm php72w-opcache php72w-gd php72w-mbstring
+- sudo vim /etc/php.ini
+ - memory_limit = 128M
+ - max_execution_time = 30
+ - max_input_time = 60
+ - post_max_size = 8M # 필요하면 조정
+ - upload_max_filesize = 2M # 필요하면 조정
+ - max_file_uploads = 20 # 필요하면 조정
+ - display_errors = On
+ - short_open_tag = Off # 필요하면 조정
+ - max_input_vars = 1000 # 필요하면 주석해제 후 사용
+- sudo systemctl enable php-fpm
+- sudo systemctl restart php-fpm
+
+- 방화벽
+- sudo yum install firewalld
+- sudo systemctl enable php-fpm
+- sudo systemctl restart php-fpm
+- sudo firewall-cmd --get-default-zone
+- sudo firewall-cmd --permanent --add-service=http
+- sudo firewall-cmd --permanent --add-service=https
+- sudo firewall-cmd --permanent --add-service=mysql
+- sudo firewall-cmd --permanent --add-service=ftp
+- sudo firewall-cmd --reload
