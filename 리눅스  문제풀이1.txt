@@ -1,0 +1,67 @@
+1. Data라는 디렉터리에 데이터를 모아놓고
+    - home 디렉터리에 data 디렉터리 생성
+        - mkdir ~/data
+    - data1.dat 파일 생성하고 아무 내용 작성
+        - touch ~/data/data1.dat
+        - echo "hello data" > ~/data/data1.dat
+
+2. 연구자들은 Data에 있는 데이터를 사용하여 연구를 하고 관련 파일을 Research 디렉터리에 관리한다.
+    - home 디렉터리에 research 디렉터리 생성
+        - mkdir ~/research
+    - res1.txt 파일 생성하고 아무 내용 작성
+        - touch ~/research/res1.txt
+        - echo "hello research" > ~/research/res1.txt
+
+3. 개발자들은 Data에 있는 데이터를 사용하여 서비스를 만들고 제공하며, 관련 소스파일을 Service라는 디렉터리에서 관리한다.
+    - home 디렉터리에 service 디렉터리 생성
+        - mkdir ~/service
+    - serv.src 파일 생성하고 아무 내용 작성
+        - touch ~/service/serv.src
+        - echo "hello service" > ~/service/serv.src
+        
+4. DataAdmin은 데이터전문가로 Data 디렉터리에 새로운 데이터를 발생시키거나 불필요한 데이터를 삭제하는 등의 관리를 한다.
+    - dataAdmin 계정 생성
+        - sudo useradd dataAdmin
+    - data 디렉터리의 소유자와 그룹을 dataAdmin으로 변경
+        - sudo chown -R dataAdmin:dataAdmin ~/data
+
+5. DevAdmin은 고급개발자로 Service의 파일을 이용해 서비스를 만들어 제공하고 필요하다면 새로운 파일을 작성하여 서비스를 고도화 할 수 있다.
+    - devAdmin은 계정 생성
+        - sudo useradd devAdmin은
+    - service 디렉터리의 소유자와 그룹을 devAdmin으로 변경
+        - sudo chown -R devAdmin:devAdmin ~/service
+
+6. ResAdmin은 수석연구자로 Research 디렉터리에 있는 파일을 이용해 연구를 진행한다. 연구 결과를 파일로 남기거나 불필요한 작업들을 삭제할 수 있다.
+    - resAdmin 계정 생성
+        - sudo useradd resAdmin
+    - research 디렉터리의 소유자와 그룹을 resAdmin으로 변경
+        - sudo chown -R resAdmin:resAdmin ~/research
+        
+7. 각 전문가들은 일손이 부족하므로 부하직원을 두고 일을 진행시킬 수 있다. 단, 부하직원들은 경험과 실력이 부족하므로 파일을 함부로 다루면 안된다.
+    - 그룹원의 권한을 약화 시킨 후 부하직원은 그룹원으로 둔다.
+        - data 디렉터리의 권한을 750으로 변경
+            - sudo chmod -R 750 ~/data    
+        - service 디렉터리의 권한을 750으로 변경
+            - sudo chmod -R 750 ~/service
+        - research 디렉터리의 권한을 750으로 변경
+            - sudo chmod -R 750 ~/research    
+
+8. 개발자들은 Data와 Service 폴더에 있는 파일을 자유롭게 열람하거나 사용할 수 있다. 단, 파일을 수정하거나 삭제하기에는 아직 경험이 부족해서 금한다.
+
+9. 연구자들은 Data와 Research 폴더에 있는 파일을 자유롭게 열람하거나 사용할 수 있다. 단, 파일을 수정하거나 삭제하기에는 아직 경험이 부족해서 금한다.
+
+10. 초보개발자1 에게 dev1이라는 계정을 만들어주고 일을 할 수 있게 권한을 주세요.
+    - 개발자1의 계정 dev1 생성
+        - sudo useradd dev1
+    - 개발자는 data와 service를 사용해야 하지만 초보개발자이기 때문에 권한이 약한 그룹원으로 임명한다.
+        - sudo gpasswd -a dev1 dataAdmin
+        - sudo gpasswd -a dev1 devAdmin
+    - dev1 계정으로 접속해 data와 service 폴더에서 파일 읽기 쓰기를 시도해본다.
+        - su dev1
+        - cat ~/data/data1.dat -> 되는 거 확인
+        - cat ~/service/serv.src -> 되는 거 확인
+        - rm ~/data/data1.dat -> 안되는 거 확인
+        - rm ~/service/serv.src -> 안되는 거 확인
+        
+11. 초보연구자1 에게 res1이라는 계정을 만들어주고 일을 할 수 있게 권한을 주세요.
+    - 상동
