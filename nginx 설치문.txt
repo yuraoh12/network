@@ -1,0 +1,52 @@
+# 응용프로그램 설치 및 사용
+---
+## 1. 개요
+ - 응용프로그램 다루는 2가지 방법
+    - 직접 빌드
+        - 다양한 배포판에 맞는 소스코드를 직접 받아 컴파일해야함 
+        - 소스코드를 받아서 컴파일하는 것은 비개발자가 하기엔 어려움 
+    - 패키지매니저(rpm, yum) 사용
+        - 해당 배포판에 맞게 환경 설정되어 빌드된 실행파일을 설치 및 관리
+        - rpm 
+            - 패키지를 하나하나 다운로드 받아야 함 
+            - 버전관리, 의존성 문제등이 있음 
+        - yum
+            - RPM의 의존성을 해결한 버전 
+            - 사용이 쉬우니 이걸로 하자 
+---
+## 2. yum repository
+  - repository는 수많은 패키지(프로그램)들이 업로드 되어 있는 거대 서버를 말한다.
+  - repository는 공식 repo 외에도 사설 repo들이 존재해 내 리눅스에 등록할 수 있다.
+    - cd /etc/yum.repos.d에 가면 repository에 대한 파일이 존재.
+        - 추후 이곳에 레파지토리를 추가해서 패키지를 설치 할 수 있음
+    - 기본 레파지토리는 패키지수가 적기 때문에 풍부한 패키지를 위해 epel-release를 설치
+        - sudo yum install epel-release
+    - 각 레파지토리는 시간이 지나면서 계속 목록이 업데이트 되기 때문에 최신 목록을 내 리눅스로 받아와야 한다. 이를 update라고 하며 아래와 같은 명령어로 수행한다.
+        - yum update 
+---
+## 3. yum 관련 명령어
+ - yum은 확장 프로그램(Plug-in)을 설치하여 수많은 명령어를 사용할 수 있다 
+    - install                 패키지 설치( rpm -i) 
+    - update               업데이트 ( rpm -U) 
+    - check-update      업데이트 가능 여부만 확인 
+    - remove              삭제( rpm -e)(설정 파일을 삭제하지는 않음) 
+    - list 
+    - list all 
+        - 설치 되어 있거나 설치 가능한 패키지 목록을 확인 
+    - list installed ( rpm -qa) 
+        - 설치 되어 있는 패키지 목록을 출력 
+    - list check-update 
+        - 업데이트된 목록 출력 
+
+    - info
+        - 패키지 정보 확인( rpm -qi)
+
+    - yum search[문자열] 
+        - 패키지 명이나 패키지 정보에서 문자열과 일치하는 패키지를 출력한다. 
+            - ex) yum search korean 
+            - ex) yum search vim
+---
+## 4. 응용프로그램 직접 설치해보기 
+- yum을 이용해 vim을 설치해보기
+    - sudo yum install vim -y
+---    
