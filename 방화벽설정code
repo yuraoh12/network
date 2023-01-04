@@ -1,0 +1,28 @@
+# 방화벽 설정
+---
+- 현재 활성화 되어 있는 zone 확인
+    - zone의 의미
+        - public : 기본 영역. 서비스 포트로 연결을 허용
+        - block : 거부
+        - trusted : 모두 허용
+    - sudo firewall-cmd --get-active-zone
+    
+- pure-ftp 용 zone 추가
+    - sudo firewall-cmd --permanent --new-zone=pure-ftp
+    
+- 서비스 목록 확인
+    - sudo firewall-cmd --get-services
+    
+- pure-ftp에 ftp 서비스 추가
+    - sudo firewall-cmd --permanent --zone=pure-ftp --add-service=ftp
+    
+- pure-ftp에 패시브 포트 레인지만큼 포트 허용하기
+    - sudo firewall-cmd --permanent --zone=pure-ftp --add-port=49000-50000/tcp
+
+- enp0s8에 pure-ftp zone 추가
+    - sudo firewall-cmd --permanent --zone=pure-ftp --change-interface=enp0s8
+    
+- network restart
+    - sudo systemctl restart network
+- firewall restart
+    - sudo systemctl restart firewalld
