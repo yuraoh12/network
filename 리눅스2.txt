@@ -1,0 +1,851 @@
+. 쉘 스크립트
+쉘 스크립트
+
+쉘이나 명령줄 인터프리터에서 돌아가도록 작성된 운영체제를 위한 스크립트
+쉘 변수
+
+aa="value"
+=에 공백 없어야 함
+$aa 이용해서 값을 얻을 수 있음
+값이 없을 땐 빈 줄
+$aa=""
+쉘 변수 값 지우기
+특수 변수
+
+$1, $2, $3…
+매개변수
+$#
+매개변수 개수
+$*
+매개변수 전체
+$$
+쉘 프로그램 실행 pid
+쉘 의사결정
+
+조건문
+```        
+if [ 조건 ]
+then
+      명령어
+fi
+```
+조건식에서 사용되는 연산자
+숫자
+-gt (>) 크다
+-lt (<) 작다
+-ge (>=) 크거나 같다
+-le (<=) 작거나 같다
+-eq (==) 같다
+-ne (!=) 같지 않다
+문자
+= (==) 같다
+!= (!=) 같지 않다
+-z var1 var1 길이가 0인 경우
+-n var1 var1 길이가 0이 아닌 경우
+2. 쉘 스크립트 예제코드
+test1.sh
+num1=1
+num2=2
+num3=3
+num4=4
+num5=5
+name=$1
+age=$2
+echo $num1
+echo $num2
+echo $num3
+echo $num4
+echo $num5
+
+/home/user1/sh-test/test2.sh $name $age
+
+실행 방법
+
+./test1.sh John 30
+test2.sh
+name=$1
+age=$2
+echo $#  #매개변수 개수
+echo $*  #전체 매개변수
+echo $$  #현재 프로그램의 PID
+
+echo "hi my name is $name!! i'm $age years old"
+실행 방법
+
+./test2.sh John 30
+test3.sh
+age=$1
+echo $age
+
+if [ "$age" -gt 20 ]
+then
+        echo "저는 성인입니다."
+fi
+
+실행 방법
+
+./test3.sh 20
+test4.sh
+age=$1
+
+if [ "$age" -ge 20 ]
+then 
+    echo "성인입니다."
+else
+    echo "미성년자입니다"
+fi
+
+실행 방법
+
+./test4.sh 20
+test5.sh
+age=$1
+
+if [ "$age" -lt 14 ]
+then
+    echo "초등학생"
+elif [ "$age" -le 17 ]
+then
+    echo "중학생"
+elif [ "$age" -lt 20 ]
+then
+    echo "고등학생"
+else 
+    echo "성인"
+fi
+
+실행 방법
+
+./test5.sh 20
+test6.sh
+
+#!/bin/bash
+num=1
+while [ "$num" -le 10 ]
+do
+    echo $num
+    num=$(($num + 1)) # 서서히 증가 -> 연산
+done
+실행 방법
+
+./test6.sh
+test7.sh
+
+#!/bin/bash
+
+for val in 1 2 3 4 5 6 7 8 9 10
+do
+    echo $val
+done
+실행 방법
+
+./test7.sh
+3. 실습문제
+a1 ~ a30까지 파일 생성
+a15 ~ a30까지 test15 ~ test30으로 이름변경
+a1 ~ a15까지 짝수번호만 삭제
+사칙연산 프로그램 calc.sh 작성하기
+ex)
+  calc.sh 1 + 2
+  3
+  calc.sh 4 / 2
+  2
+  calc.sh 10 - 5
+  5
+
+5. php 설치
+기존 php 지우기
+
+sudo yum remove php*
+php 8 설치
+
+설치
+sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+sudo yum -y install https://rpms.remirepo.net/enterprise/remi-release-7.rpm
+sudo yum -y install yum-utils
+sudo yum-config-manager --disable 'remi-php*'
+sudo yum-config-manager --enable remi-php80
+sudo yum -y install php php-{common,cli,fpm,mysqlnd,zip,devel,gd,mbstring,curl,xml,pear,bcmath,json,opcache,mcrypt}
+php 8 버전 확인
+
+php -v
+6. 쌩 html과 php를 이용한 구구단 서비스
+쌩 html
+
+gugudan_1.html
+<meta charset="UTF-8">
+<h1>1단</h1>
+
+<div>1 * 1 = 1</div>
+<div>1 * 2 = 2</div>
+<div>1 * 3 = 3</div>
+<div>1 * 4 = 4</div>
+gugudan_2.html
+<meta charset="UTF-8">
+<h1>1단</h1>
+
+<div>2 * 1 = 2</div>
+<div>2 * 2 = 4</div>
+<div>2 * 3 = 6</div>
+<div>2 * 4 = 8</div>
+php 구구단
+
+gugu.php
+<meta charset="UTF-8">
+<?php
+$dan = 1; // 이 부분을 변경하면서 실행
+?>
+<h1><?=$dan?>단</h1>
+
+<?php for ( $i = 1; $i <= 10; $i++ ) { ?>
+<div><?=$dan?> * <?=$i?> = <?=$dan * $i?></div>
+<?php } ?>
+7. php-fpm 연동
+php-fpm 켜기
+sudo systemctl status php-fpm
+sudo systemctl start php-fpm
+sudo systemctl enable php-fpm
+sudo ps -ef | grep php
+php 프로세스가 평소에 몇개 떠 있는지 확인할 수 있음
+sudo netstat -nlpt | grep php
+php-fpm이 몇번 포트와 연결되어 있는지 확인할 수 있음
+nginx에 php 연동 설정
+vhost.conf 설정파일에 원하는 server에 다음 내용을 추가
+내용
+    set $documentRoot /web/site1/public;
+
+    index index.php index.html index.htm;
+    root $documentRoot;
+
+    location ~ \.php$ {
+        root $documentRoot;
+        fastcgi_pass 127.0.0.1:9000;
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME $documentRoot/$fastcgi_script_name;
+        include /etc/nginx/fastcgi_params;
+        fastcgi_read_timeout 600;
+    }
+향상된 구구단
+enhanced_gugu.php
+<meta charset="UTF-8">
+<?php
+$dan = $_GET['dan'];
+$limit = $_GET['limit'];
+?>
+<h1><?=$dan?>단</h1>
+
+<?php for ( $i = 1; $i <= $limit; $i++ ) { ?>
+<div><?=$dan?> * <?=$i?> = <?=$dan * $i?></div>
+<?php } ?>
+8. HOST 세팅하기
+일일이 IP를 기억하기는 쉽지 않고 번거롭다. 나만의 DNS 만들기
+C:\Windows\System32\drivers\etc\hosts 파일 열기
+192.168.1.111 myserver
+이때 IP는 자신이 등록하고자 하는 IP를 적어야함. 위 IP는 하나의 예시.
+9. DB 연동
+관리자 로그인
+
+mysql -u root -p1234
+site1 DB 생성
+
+CREATE DATABASE site1;
+site1 계정 생성 과 동시에, 해당 계정에 site1안에 들어있는 모든 테이블에 관한 권한을 부여
+GRANT ALL PRIVILEGES ON site1.* TO site1@% IDENTIFIED BY 'korea1234'
+db 생성 및 세팅
+
+DROP DATABASE IF EXISTS site1;
+CREATE DATABASE site1;
+use site1;
+
+CREATE TABLE article (
+    id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    reg_date DATETIME NOT NULL,
+    update_date DATETIME NOT NULL,
+    title VARCHAR(100) NOT NULL,
+    `body` TEXT NOT NULL
+);
+
+INSERT INTO article
+SET reg_date = NOW(),
+update_date = NOW(),
+title = '제목1',
+`body` = '내용1';
+
+INSERT INTO article
+SET reg_date = NOW(),
+update_date = NOW(),
+title = '제목2',
+`body` = '내용2';
+
+INSERT INTO article
+SET reg_date = NOW(),
+update_date = NOW(),
+title = '제목3',
+`body` = '내용3';
+
+SELECT * FROM article;
+10. 게시물 리스트 프로그램
+article_list.php
+<meta charset="UTF-8" />
+<?php
+$db_conn = mysqli_connect('myserver', 'site1', 'korea123414', 'site1');
+
+$sql = "
+SELECT *
+FROM article
+ORDER BY id DESC
+";
+
+$rs = mysqli_query($db_conn, $sql);
+
+$articles = [];
+
+while ( $article = mysqli_fetch_assoc($rs) ) {
+    $articles[] = $article;
+}
+?>
+
+<ul>
+    <?php foreach ( $articles as $article ) { ?>
+    <li><?=$article['id']?>/<?=$article['reg_date']?>/<?=$article['title']?></li>
+    <?php } ?>
+</ul>
+11. 실습 내용
+php관련 패키지 삭제
+
+sudo yum remove php*
+nginx - php - db 연동
+
+nginx에 php 연동 설정
+기존의 site1 호스트 말고 site2 호스트에 세팅해주세요.
+db 연동
+site2 DB 생성 후 site2 유저 생성 및 권한 부여
+최종 myserver:8082/article_list.php로 요청했을 때 게시물 리스트 나오게 하면 됩니다.
+12. 도커 개요
+프로그램은 운영체제 위에서 돌아간다.
+운영체제는 커널 + 패키지로 이루어져 있다.
+이 패키지 구성이 어떠냐에 따라 배포판이 달라진다.
+배포판들은 커널을 공유한다.
+운영체제 위에서 돌아가는 프로그램은 운영체제의 패키지 또는 외부 패키지를 이용해서 실행된다.
+프로그램의 실행이 운영체제와 관련 패키지에 종속된다. ( 운영체제가 바뀌거나 패키지가 바뀌면 잘 되던게 안될 수 있다. )
+일반적으로 서로 다른 환경에서 애플리케이션이 구축된다.
+개발은 대부분 mac, windows에서 이루어지며 완성된 어플리케이션을 서버에 배포하는 방식이다.
+이 과정에서 개발 환경과 배포가 되는 서버 환경이 다를 수 있다.
+이를 해결하기 위해 운영체제와 의존 패키지를 하나의 프로그램화(가상머신)하여 배포하게 된다.
+좋은 방법이기는 하지만 운영체제가 사용하는 리소스가 커서 성능이 좋지 않다.
+운영체제의 핵심인 커널만 공유하고 패키지만을 이용해 프로그램화하는 것이 도커이다.
+커널은 도커엔진이 관리
+컨테이너는 패키지만을 묶은 프로그램
+13. 네트워크 구성 방법 복습
+NAT
+라우터를 거쳐서 라우터가 만들어주는 사설 IP를 사용.
+외부에서 내부망을 접근할 수 없기 때문에 포트포워딩 필요.
+브릿지
+인터넷 선을 직접 연결하여 사용. 공인 IP를 사용.
+공인 IP이므로 외부에서 접근 가능
+
+14. 도커 설치
+설치 공식 문서
+sudo yum install -y yum-utils
+sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+sudo yum install docker-ce docker-ce-cli containerd.io docker-compose-plugin -y
+sudo systemctl start docker
+sudo systemctl enable docker
+15. 도커를 sudo 없이 사용
+sudo usermod -aG docker ${USER}
+재시작
+16. 이미지와 프로세스
+이미지는 프로그램(코드)이고 컨테이너는 프로세스(연산이다.)
+17. 도커 이미지 관련 기본 명령어
+도커 명령어 공식 문서
+도커 허브
+도커계의 앱스토어
+docker pull 이미지명
+이렇게 하면 도커허브에서 이미지를 다운로드 한다.
+docker pull 이미지명
+다운로드
+docker rmi -f 이미지명
+삭제
+docker images
+목록
+18. 컨테이너 관련 명령어
+조회 : docker ps
+현재 실행중인 컨테이너 목록
+전체조회 : docker ps -a
+종료된 컨테이너도 표시
+18. 컨테이너 관련 명령어
+조회 : docker ps
+
+현재 실행중인 컨테이너 목록
+전체조회 : docker ps -a
+종료된 컨테이너도 표시
+컨테이너 ID와 이름은 고유합니다.
+아래 명령어 3개는 전부 같은 의미 입니다.
+docker logs 7daa850a1d69
+docker logs 7d
+docker logs intelligent_faraday
+
+19. nginx 컨테이너 실행해보기
+docker run nginx
+
+문제점 : 제어권을 nginx가 잡고 안놔준다.
+외부에서 접근할 수 없다.
+원래 도커 컨테이너는 독립적인 공간에서 실행되기 때문에 접근이 안되는게 정상이다.
+docker run -d nginx
+
+detach 옵션 : 프로세스를 백그라운드로 돌리고 제어권 유지
+여전히 외부에서 접근할 방법이 없다.
+docker run -d -p 8031:80 nginx
+
+포트포워딩, 외부에서 접근 가능
+크롬에서 확인
+docker run --name=app1 -d -p 8031:80 nginx
+
+컨테이너의 이름 설정 -> app1, 컨테이너를 선택할 때 id 대신 사용 가능. 생략시 랜덤하게 이름 정해짐
+docker stop ${con_id}
+
+해당 ID의 컨테이너를 종료함.
+
+20. 도커 컨테이너에 명령 내리기
+명령어 기본 구조
+docker exec 컨테이너 쉘명령어
+docker exec app1 vim /etc/os-release
+app1 컨테이너의 배포판을 확인한다. Debian 배포판인 것을 확인할 수 있다.
+docker exec app1 apt-get update
+app1 컨테이너에 apt-get update 명령어 실행. apt-get은 데비안 계열의 yum 명령어이다.
+docker exec -it app1 apt-get install vim
+app1 컨테이너에 vim을 설치한다. 기본적으로 패키지 설치시에는 설치에 대한 의사를 물어보는데 이럴 때는 -it 옵션으로 상호작용 의사를 밝혀야 한다.
+docker exec -it app1 bash
+위와 마찬가지로 bash의 경우 명령어 입력이 이루어지므로 상호작용이 필요한 작업이기 때문에 -it 옵션이 필요하다.
+app1 컨테이너 안의 파일 내용을 수정하기
+app1 컨테이너의 /usr/share/nginx/html 경로로 가서 index.html 파일의 제목을 수정해본다.
+수정한 후에 브라우저를 통해 확인한다.
+컨테이너는 수시로 삭제되고 다시 생성되기 때문에 컨테이너 내부의 파일을 수정하거나 추가한 것은 컨테이너가 삭제될 때 같이 삭제된다.
+app1 컨테이너 제거 후 다시 시작해보기
+docker stop app1
+app1 컨테이너 중지
+docker rm app1
+app1 컨테이너 삭제
+docker run --name=app1 -d -p 8031:80 --rm nginx
+app1 컨테이너 재생성.
+--rm 옵션은 컨테이너 중지하면 자동으로 삭제하는 옵션. 컨테이너를 지우지 않고 유지하면 관리가 어렵다.
+브라우저를 통해 확인
+수정했던 내용이 초기화 된 것을 확인할 수 있다.
+
+21. 도커 볼륨 사용해보기
+볼륨이란 컨테이너의 데이터 유지 한계를 극복하기 위해 로컬 PC(HOST 리눅스)에 컨테이너의 파일을 저장하는 공간을 의미
+
+볼륨은 다음과 같이 3가지 유형이 있음
+
+익명 볼륨
+로컬PC 어딘가에 저장
+컨테이너 종료와 함께 사라짐
+추후 볼륨 병합 때 사용
+네임드 볼륨
+로컬PC 어딘가에 저장
+이름이 지정되어 따로 지우지 않으면 유지
+추후 다른 컨테이너에 붙일 수 있음
+마운트 볼륨
+...
+익명 볼륨 실습
+
+컨테이너 생성시 익명 볼륨 설정
+docker run --name=app1 -d -p 8031:80 --rm -v /usr/share/nginx/html nginx
+-v 옵션은 컨테이너의 /usr/share/nginx/html 폴더를 로컬PC에 볼륨으로 만들겠다는 의미
+익명 볼륨 생성 확인
+docker volume ls
+이름이 임의로 정해진 익명 볼륨 확인
+컨테이너 내부로 들어가 파일 수정하기
+docker exec -it app1 bash
+컨테이너 쉘로 진입
+cd /usr/share/nginx/html
+수정할 파일이 있는 폴더로 이동
+apt-get update
+패키지 매니저 업데이트
+apt-get install vim -y
+vim 에디터 설치
+vim index.html
+설치한 vim으로 index.html 내용 수정
+브라우저에서 수정된 내용 확인
+컨테이너 종료시 볼륨 사라지는 것 확인
+docker stop app1
+docker volume ls
+없어진 것을 확인
+다시 익명 볼륨으로 컨테이너 생성 후 파일 확인
+docker run --name=app1 -d -p 8031:80 --rm -v /usr/share/nginx/html nginx
+브라우저로 초기화 된 것을 확인
+결론적으로 익명 볼륨으로는 컨테이너의 데이터를 유지할 수 업음.
+네임드 볼륨 실습
+
+컨테이너 생성시 네임드 볼륨 설정
+
+docker run --name=app1 -d -p 8031:80 --rm -v data:/usr/share/nginx/html nginx
+-v 옵션으로 볼륨 설정할 때 대상 폴더 앞에 볼륨이름:을 붙인다.
+네임드 볼륨 생성 확인
+
+docker volume ls
+data로 이름지어진 볼륨 확인 가능
+컨테이너 내부로 들어가 파일 수정하기
+
+docker exec -it app1 bash
+컨테이너 쉘로 진입
+cd /usr/share/nginx/html
+수정할 파일이 있는 폴더로 이동
+apt-get update
+패키지 매니저 업데이트
+apt-get install vim -y
+vim 에디터 설치
+vim index.html
+설치한 vim으로 index.html 내용 수정
+브라우저에서 수정된 내용 확인
+컨테이너 종료시에도 볼륨이 유지되는 것 확인
+
+docker stop app1
+docker volume ls
+컨테이너 제거 후에도 data 볼륨이 있는 것 확인
+다시 네임드 볼륨으로 컨테이너 생성 후 파일 확인
+
+docker run --name=app1 -d -p 8031:80 --rm -v data:/usr/share/nginx/html nginx
+브라우저로 변경사항이 계속 유지되는 것을 확인
+
+22. 도커 마운트 볼륨 사용해보기
+마운트 볼륨
+호스트 PC 특정 폴더와 컨테이너 특정 폴더를 동기화
+컨테이너의 파일이 호스트를 덮어쓰면 호스트에 문제가 생길 수 있으므로 호스트의 파일을 컨테이너로 덮어 씀
+마운트 볼륨 실습
+컨테이너가 켜져 있다면 종료하고 삭제(컨테이너의 이름이 app1이라고 가정)
+docker stop app1
+docker rm app1 (만일 실행할 때 --rm 옵션을 줬다면 이 작업은 건너 뛰어도 됨)
+작업 폴더 생성
+mkdir -p /home/user1/work/html
+작업 폴더와 컨테이너 nginx의 root폴더(/usr/share/nginx/html)를 마운트 볼륨 설정
+docker run --name=app1 -d -p 8031:80 --rm -v /home/user1/work/html:/usr/share/nginx/html nginx
+브라우저로 확인
+페이지가 뜨지 않는다. 이유는 작업 폴더의 내용으로 컨테이너의 폴더를 덮어 쓰는데 작업 폴더가 비어있기 때문에 컨테이너의 폴더도 비어 있게 된다.
+작업 폴더에 파일 생성
+vi index.html
+내용은 아무거나 작성
+vi test.html
+내용은 아무거나 작성
+컨테이너 껐다가 마운트 볼륨으로 다시 실행
+docker stop app1
+docker run --name=app1 -d -p 8031:80 --rm -v /home/user1/work/html:/usr/share/nginx/html nginx
+브라우저로 확인
+작업 폴더(/home/user1/work/html)에서 생성한 파일이 컨테이너에서 실행되는 것을 확인
+--
+23. 실습 문제 - 두개의 작업폴더를 만들어 컨테이너의 nginx 설정과 root 폴더 관리하기
+설정 파일용 작업 폴더 생성
+mkdir -p /home/user1/work/conf/nginx
+기존의 nginx 설정 폴더를 작업폴더로 복사
+cp -r /etc/nginx/ /home/user1/work/conf/
+가상호스팅 설정 세팅 (리눅스1의 86번 강의 참고)
+vi /home/user1/work/conf/nginx/conf.d/vhost.conf
+아래와 같이 작성
+listen 8099;
+server_name project1;
+
+location / {
+        root /web/site1/public;
+        index index.html;
+}
+root 디렉터리용 작업 폴더 생성
+mkdir -p /home/user1/work/html
+index.html, test.html 작성
+vi /home/user1/work/html/index.html
+vi /home/user1/work/html/test.html
+각각 아무 내용이나 작성
+두 작업 폴더를 컨테이너의 특정 폴더의 마운트 볼륨으로 사용
+컨테이너가 켜져 있다면 종료
+docker stop app1
+볼륨을 설정하여 컨테이너를 실행, 이때 가상호스팅(vhost.conf)를 설정했을 때의 port로 포워딩해야함을 주의.
+docker run --name=app1 -d -p 8031:8099 --rm -v /home/user1/work/html:/web/site1/public -v /home/user1/work/conf/nginx:/etc/nginx nginx
+브라우저를 통해 확인
+8099 포트로 접속하여 index.html 페이지 뜨는지 확인
+작업폴더인 /home/user1/work/html/index.html 파일의 내용을 수정 한 후에 컨테이너의 내용이 수정되는지를 확인
+
+24. 컨테이너의 네트워크 통신
+case
+case1. 컨테이너 -> 외부
+
+wget으로 실습
+컨테이너가 켜져있다면 종료
+docker stop app1
+컨테이너 실행
+docker run --name=app1 -d -p 8031:8099 --rm -v /home/user1/work/html:/web/site1/public -v /home/user1/work/conf/nginx:/etc/nginx nginx
+컨테이너의 내부 쉘에 접속
+docker exec -it app1 bash
+패키지 관리자 업데이트
+apt-get update
+wget 패키지 설치
+apt-get install wget
+wget으로 네이버에 요청해서 메인페이지 다운로드 받아보기
+wget https://www.naver.com
+case2. 컨테이너 -> 내부
+
+wget으로 실습
+컨테이너가 켜져있다면 종료
+docker stop app1
+컨테이너 실행
+docker run --name=app1 -d -p 8031:8099 --rm -v /home/user1/work/html:/web/site1/public -v /home/user1/work/conf/nginx:/etc/nginx nginx
+컨테이너의 내부 쉘에 접속
+docker exec -it app1 bash
+자신의 local로 웹요청 보내보기
+wget 127.0.0.1 혹은 wget localhost
+컨테이너의 nginx가 바라보는 index.html이 다운로드 완료되는지 확인
+wget 127.0.0.1:8099 혹은 wget localhost:8099
+8099로 세팅한 폴더의 index.html이 다운로드 완료되는지 확인
+case3. 컨테이너 -> 호스트PC(여러분의 centos)
+
+nginx 컨테이너와 호스트PC의 php-fpm과 통신하는 것으로 실습
+컨테이너가 켜져있다면 종료
+
+docker stop app1
+컨테이너 실행
+
+docker run --name=app1 -d -p 8031:8099 --rm -v /home/user1/work/html:/web/site1/public -v /home/user1/work/conf/nginx:/etc/nginx nginx
+설정 작업 폴더(/home/user1/work/conf/nginx/)의 vhost.conf 파일에 php-fpm 관련 설정 추가
+
+vi /home/user1/work/conf/nginx/conf.d/vhost.conf
+아래와 같이 작성
+server {
+    listen 8099;
+    server_name project1;
+
+    location / {
+            root /web/site1/public;
+            index index.html;
+    }
+    set $documentRoot /web/site1/public;
+
+    index index.php index.html index.htm;
+    root $documentRoot;
+
+    location ~ \.php$ {
+            root $documentRoot;
+            fastcgi_pass 여러분의 리눅스 IP:9000;
+            fastcgi_index index.php;
+            fastcgi_param SCRIPT_FILENAME $documentRoot/$fastcgi_script_name;
+            include /etc/nginx/fastcgi_params;
+            fastcgi_read_timeout 600;
+    }
+}
+여기서 $documentRoot의 경로는 php-fpm이 바라보고 있는 경로를 의미
+php-fpm은 컨테이너가 아닌 호스트PC의 서비스이므로 이 서비스가 바라보는 파일시스템은 centos7의 파일시스템입니다.
+php-fpm 설정 변경
+
+vi /etc/php-fpm.d/www.conf
+아래 두가지 값을 찾아서 수정
+listen = 127.0.0.1:9000을 listen = 0.0.0.0:9000
+listen.allowed_clients = 127.0.0.1의 앞에 ;를 붙여 주석처리
+php-fpm를 외부에서 접속 가능하게 하는 세팅
+호스트PC(centos7)의 php-fpm 서비스 재시작
+
+sudo systemctl restart php-fpm
+nginx 컨테이너 재시작
+
+docker stop app1
+docker run --name=app1 -d -p 8031:8099 --rm -v /home/user1/work/html:/web/site1/public -v /home/user1/work/conf/nginx:/etc/nginx nginx
+브라우저에서 test.php를 열어서 확인
+
+case4. 컨테이너 -> 컨테이너
+
+nginx 컨테이너 php-fpm 컨테이너와 통신하는 것으로 실습
+컨테이너가 켜져있다면 종료
+docker stop app1
+php-fpm 도커라이즈
+이미지 다운로드
+docker pull bitnami/php-pfm
+컨테이너 실행
+docker run -it --name phpfpm -d -p 9001:9000 -v /work/scripts:/app bitnami/php-fpm
+nginx의 설정 파일에서 nginx가 php-fpm 컨테이너를 바라보게 수정
+vim /work/conf/nginx/conf.d/vhost.conf
+아래와 같이 수정
+    listen 8099;
+    server_name project1;
+
+    location / {
+            root /web/site1/public;
+            index index.html;
+    }
+    set $documentRoot /app;
+
+    index index.php index.html index.htm;
+    root $documentRoot;
+
+    location ~ \.php$ {
+            root $documentRoot;
+            fastcgi_pass 172.17.0.1:9001;
+            fastcgi_index index.php;
+            fastcgi_param SCRIPT_FILENAME $documentRoot/$fastcgi_script_name;
+            include /etc/nginx/fastcgi_params;
+            fastcgi_read_timeout 600;
+    }
+호스트 PC의 php-fpm 서비스 내리기
+sudo systemctl stop php-fpm
+브라우저에서 동작 확인
+도커 네트워크1
+도커 네트워크2
+25. mariadb 컨테이너 실행하기
+이미지 다운로드
+docker pull mariadb
+컨테이너 실행
+docker run -d --name db -p 3307:3306 --env MARIADB_ROOT_PASSWORD=1234 --rm mariadb:latest
+MARIADB_ROOT_PASSWORD는 컨테이너 내부에서 사용할 mysql root 계정의 비밀번호
+DB 생성을 위한 컨테이너 내부 진입
+docker exec -it db bash
+mysql 보안설정
+/usr/bin/mariadb-secure-installation
+첫번째 : 위에서 설정한 root 비밀번호
+두번째, 세번째 : n
+나머지 : y
+mysql 접속 후 원격접속용 계정 생성 및 권한 부여
+GRANT ALL PRIVILEGES ON . TO korea@'%' IDENTIFIED BY 'korea1234';
+
+sqlyog로 컨테이너 DB에 원격 접속
+
+host : 리눅스 IP
+port : 3307
+user : korea
+password : korea1234
+sql 작성 및 실행
+
+DROP DATABASE IF EXISTS site1;
+CREATE DATABASE site1;
+use site1;
+
+CREATE TABLE article (
+    id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    reg_date DATETIME NOT NULL,
+    update_date DATETIME NOT NULL,
+    title VARCHAR(100) NOT NULL,
+    `body` TEXT NOT NULL
+);
+
+INSERT INTO article
+SET reg_date = NOW(),
+update_date = NOW(),
+title = '제목1',
+`body` = '내용1';
+
+INSERT INTO article
+SET reg_date = NOW(),
+update_date = NOW(),
+title = '제목2',
+`body` = '내용2';
+
+INSERT INTO article
+SET reg_date = NOW(),
+update_date = NOW(),
+title = '제목3',
+`body` = '내용3';
+
+SELECT * FROM article;
+db에 접근하는 php-fpm컨테이너의 article_list.php 파일의 내용을 수정
+
+vim /work/scripts/article_list.php
+DB 접속부분을 아래와 같이 수정
+$db_conn = mysqli_connect('172.17.0.1:3307', 'korea', 'korea123414', 'site1');
+호스트 PC의 mysql 서비스 내리기
+
+sudo systemctl stop mysql
+브라우저로 결과 확인
+
+26. 도커 네트워크 정리
+도커를 설치하면 도커가 사용하는 docker0이라는 네트워크 어댑터가 생성됨.
+모든 컨테이너는 도커에 의해 관리되므로 네트워크도 도커 네트워크로부터 파생됨(사설 IP)
+외부에서는 컨테이너의 네트워크로 접속하지 못함.(사설 IP 이므로)
+외부에서는 컨테이너의 네트워크로 접속하려면 포트포워딩을 해야함. (외부 -> 호스트 -> 도커(포트포워딩) -> 컨테이너)
+사설 IP를 가지고 있는 도커 내부의 컨테이너 끼리는 다이렉트로 통신 가능
+docker inspect 컨테이너이름
+컨테이너의 상세 정보를 볼 수 있으며 사설IP 주소도 확인 가능.
+실습 문제
+도커 초기화 명령
+    # 컨테이너 삭제
+    docker rm -f $(docker ps -qa)
+
+    # 이미지 삭제
+    docker rmi -f $(docker images -qa)
+
+    # 안쓰는 네트워크 삭제
+    docker network prune -f
+
+    # 안쓰는 볼륨 삭제
+    docker volume prune -f
+
+    # 도커 작업 폴더 삭제
+    sudo rm -rf /work
+도커 초기화 한 후에 nginx, php-fpm, mariadb를 각각 컨테이너로 서비스해주세요.
+브라우저에 IP:8080 요청하면 article_list.php 내용이 실행되도록 해야합니다.
+
+
+27. 도커 컴포즈를 이용해 컨테이너 관리하기
+docker compose documentation
+docker compose 버전 정보
+docker-compose.yaml 파일 생성
+vi docker-compose.yaml
+version: "3.8"
+services:
+        web:
+                image: "nginx"
+                ports:
+                        - 8080:8080
+                volumes:
+                        - /home/user1/work/nginx/conf:/etc/nginx/conf.d
+                        - /home/user1/work/nginx/html:/web/site1/public
+        fpm:
+                image: "bitnami/php-fpm"
+                ports:
+                        - 9001:9000
+                volumes:
+                        - /home/user1/work/phpfpm/scripts:/app
+        db:
+                image: "mariadb"
+                ports:
+                        udo yum update 3306:3306
+                volumes:
+                        - /var/lib/mysql:/var/lib/mysql
+                environment:
+                        - MARIADB_ROOT_PASSWORD=1234
+
+28. 도커 이미지 만들기
+실행중인 컨테이너를 이용해 이미지 제작하기
+docker commit 대상컨테이너 이미지이름:태그
+ex) docker commit db1 mydb:1.0
+Dockerfile을 이용해 제작하기
+Dockerfile 생성
+
+vi Dockerfile
+아래와 같이 작성
+    FROM nginx
+    
+    RUN ["mkdir", "/test"]
+    
+    RUN ["mkdir", "-p" ,"/web/site1/public"]
+    
+    COPY ./html /web/site1/public
+    
+    COPY ./conf /etc/nginx/conf.d
+    
+도커 이미지 빌드
+
+docker build -t 이미지이름:태그이름 도커파일경로
+docker build -t myimg:1.0 /home/user1/work/nginx
+도커 이미지 업로드
+
+dockerhub 사이트 가입
+docker login
+아이디, 이름 입력
+docker push 계정닉네임/이미지이름:태그이름
+업로드를 위해 이미지이름에 닉네임 넣기
+docker image tag myimg:1.0 nickname/myimg:1.0
+도커 이미지 다운로드
+
+docker pull nickname/myimg:1.0
+
+Dockerfile을 이용한 이미지 빌드와 push, pull
+도커 이미지 push, pull 원리 및 실습
+29. 실전 배포. 서버 및 도메인 구매하고 설정하기
+
+30. git 최신버전 설치
+sudo yum install http://opensource.wandisco.com/centos/7/git/x86_64/wandisco-git-release-7-1.noarch.rpm
+sudo yum install git
