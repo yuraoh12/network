@@ -1,0 +1,1469 @@
+도커 설치
+# Uninstall old versions
+# 혹시 모르니 기존의 오래된 도커를 삭제하는 명령을 수행
+yum remove docker \
+    docker-client \
+    docker-client-latest \
+    docker-common \
+    docker-latest \
+    docker-latest-logrotate \
+    docker-logrotate \
+    docker-engine
+
+# Set up the repository
+yum install -y yum-utils
+
+yum-config-manager \
+    --add-repo \
+    https://download.docker.com/linux/centos/docker-ce.repo
+    
+# Install Docker Engine
+yum install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+# 도커 시작
+systemctl start docker
+
+# 도커 활성화
+systemctl enable docker
+
+# 도커 작동 테스트
+docker run hello-world
+
+
+
+요약
+도커 이미지 == 프로그램
+
+도커 컨테이너 == 프로세스 == 가상OS
+
+
+
+도커허브
+
+도커계의 앱스토어
+
+docker pull 이미지명
+
+이렇게 하면 도커허브에서 이미지를 다운로드 한다.
+
+명령어
+docker pull 이미지명
+
+이미지 다운로드
+
+docker rmi -f 이미지명
+
+이미지 삭제
+
+docker images
+
+이미지 목록
+
+docker ps
+
+실행중인 컨테이너 목록
+
+docker ps -a
+
+실행종료된 컨테이너 목록도 표시
+
+docker run hello-world
+
+hello-world 이미지 실행
+
+docker stop 컨테이너ID
+
+컨테이너 정지
+
+단 컨테이너가 실행중인 상태일때만 의미가 있음
+
+docker start 컨테이너ID
+
+컨테이너를 다시 실행
+
+단 컨테이너가 중지된 상태일때만 의미가 있음
+
+docker rm 컨테이너ID
+
+컨테이너(프로세스) 자체를 삭제
+
+흔적도 없이 삭제
+
+
+명령어
+docker ps -a -q
+
+모든 컨테이너의 ID만 출력
+
+docker rm -f $(docker ps -a -q)
+
+모든 컨테이너 삭제
+
+docker images -q
+
+모든 이미지의 ID만 출력
+
+docker rmi $(docker images -q)
+
+모든 이미지 삭제
+
+
+명령어
+쉘1 : docker rm -f $(docker ps -a -q)
+
+쉘1 : docker rmi $(docker images -q)
+
+쉘1 : docker run nginx
+
+데몬성격의 컨테이너 이기 때문에 Ctrl + C 를 누르지 않으면 계속 실행
+
+쉘2 : docker ps
+
+현재 실행되고 있는 nginx 컨테이너에 대한 정보가 나옴
+
+쉘2 : docker stop 컨테이너ID
+
+nginx 컨테이너 정지
+
+쉘1 : nginx 컨테이너가 꺼진것을 확인
+
+
+CONTAINER ID	IMAGE	COMMAND	CREATED	STATUS	PORTS	NAMES
+7daa850a1d69	feb5d9fea6a5	"/hello"	19 minutes ago	Exited (0) 19 minutes ago		intelligent_faraday
+3b06ae5e2854	feb5d9fea6a5	"/hello"	28 minutes ago	Exited (0) 28 minutes ago		suspicious_keller
+컨테이너 ID와 컨테이너 이름은 고유합니다.
+아래 명령어 3개는 전부 같은 의미 입니다.
+
+docker logs 7daa850a1d69
+
+docker logs 7d
+
+docker logs intelligent_faraday
+
+명령어
+쉘1 : docker rm -f $(docker ps -a -q)
+
+쉘1 : docker run nginx
+
+이렇게 name 옵션을 넘기지 않으면 자동으로 컨테이너 이름이 생성됩니다.
+
+쉘3 : docker run --name=paul nginx
+
+쉘2 : docker ps
+
+쉘2 : docker logs 컨테이너ID
+
+쉘2 : docker logs 컨테이너ID(ID의 앞 2글자만 입력)
+
+쉘2 : docker logs 컨테이너이름
+
+
+컨테이너 상태 자세히 보기
+docker rm -f $(docker ps -a -q)
+
+docker run -d nginx
+
+d는 데몬모드에 맞게 대응 하겠다는것을 의미합니다.
+
+d를 붙인다고 컨테이너가 실행이 유지되는것이 아닙니다.
+
+docker logs 컨테이너ID
+
+컨테이너 내부에서 출력되고 있는 내용을 확인
+
+docker inspect 컨테이너ID
+
+컨테이너 내부에서 명령어 실행
+
+docker inspect 컨테이너ID | less
+
+내용이 너무 길어서 less 사용
+
+방향키 위, 아래, 좌, 우 사용하여 편하게 볼 수 있음
+
+종료 : q
+
+
+명령어
+docker rm -f $(docker ps -a -q)
+
+docker run -d --name=nginx_1 --rm nginx
+
+--rm 옵션은 컨테이너가 종료될 때 자동으로 흔적도 없이 사라지라는 의미
+
+단순명령
+docker exec 컨테이이너ID 명령어
+
+docker exec nginx_1 ls
+
+docker exec nginx_1 apt-get update
+
+상호작용필요명령
+docker exec -it 컨테이이너ID 명령어
+
+docker exec -it nginx_1 apt-get install vim
+
+y 입력
+
+위 명령어 실행 전에
+
+docker exec nginx_1 apt-get update
+
+명령어 수행을 해야 함
+
+docker exec -it nginx_1 bash
+
+안될때는
+
+docker exec -it nginx_1 sh
+
+
+
+명령어
+docker rm -f $(docker ps -a -q)
+
+docker run -d --name=nginx_1 --rm nginx
+
+docker exec -it nginx_1 bash
+
+apt-get update
+
+apt-get install -y iproute2
+
+ip addr
+
+IP 확인
+
+아마도 172.17.0.2
+
+exit
+
+nginx_1 도커 컨테이너에서 빠져나가기
+
+ping 172.17.0.2
+
+curl http://172.17.0.2:80/
+
+curl 은 리눅스의 브라우저
+
+curl 172.17.0.2
+
+이런식으로 프로토콜 부분과 포트 부분을 생략해도 가능
+
+
+
+docker rm -f $(docker ps -a -q)
+
+docker run -d --name=nginx_1 --rm nginx
+
+docker inspect nginx_1 | fgrep IPAddress
+
+curl 172.17.0.2
+
+172.17.0.2 == 도커 컨테이너의 IP
+
+이 IP는 실습자에 따라 다를 수 있습니다.
+
+크롬 : http://192.168.0.34:81
+
+192.168.0.34 == 리눅스의 IP
+
+접속실패
+
+포트포워딩을 해야 함
+
+docker stop nginx_1
+
+docker run -d --name=nginx_1 --rm -p 81:80 nginx
+
+크롬 : http://192.168.0.34:81
+
+192.168.0.34 == 리눅스의 IP
+
+이 IP는 실습자에 따라 다를 수 있습니다.
+
+
+
+
+명령어
+yum install -y net-tools
+
+netstat -nlp
+
+각 프로세스별 포트사용 현황
+
+netstat -nlp | fgrep nginx
+
+nginx가 몇번 포트를 점유하고 있는지 확인
+
+만약에 nginx가 켜져있지 않다면
+
+systemctl start nginx
+
+docker rm -f $(docker ps -a -q)
+
+docker run -d --name=nginx_1 --rm -p 80:80 nginx
+
+안됨
+
+systemctl stop nginx
+
+docker run -d --name=nginx_1 --rm -p 80:80 nginx
+
+됨
+
+크롬 : http://192.168.0.34
+
+192.168.0.34 == 리눅스의 IP
+
+이 IP는 실습자에 따라 다를 수 있습니다.
+
+
+
+
+글 - MAC(맥북)과 윈도우에서 hosts파일을 수정하는 방법
+
+특정 도메인에 연결된 IP 확인하는 방법
+nslookup www.naver.com
+
+mac 이나 윈도우에서 실행해야 합니다.
+
+윈도우에서는 cmd
+
+맥에서는 쉘
+
+리눅스 환경에서는 명령어를 설치해야 사용햘 수 있습니다.
+
+yum install -y bind-utils net-tools
+
+ipconfig /all
+
+윈도우 명령어
+
+랜카드에 설정된 dns 주소도 볼 수 있다.
+
+ipconfig /flushdns
+
+윈도우 명령어
+
+DNS 캐시를 삭제한다.
+
+윈도우에서 hosts 파일 열고 수정
+메모장을 관리자권한으로 열기
+
+파일 => 열기
+
+경로 C:\Windows\System32\drivers\etc
+
+확장자 : 텍스트 문서(*.txt) => 모든 파일 (*.*)
+
+hosts 파일 열기, 편집 후 저장
+
+저장을 해야 반영됩니다.
+
+적용이 안된다면, 모든 브라우저 재시작, 안되면 PC 재부팅
+
+hosts 파일에 추가할 내용
+127.0.0.1		site1.com
+127.0.0.1		site2.com
+127.0.0.1		site3.com
+127.0.0.1		site4.com
+127.0.0.1		site5.com
+127.0.0.1		site6.com
+검증 명령어(hosts 파일이 잘 작성되었는지 검증)
+ping site1.com
+
+127.0.0.1 로 연결되어야 합니다.
+
+img
+
+mac 이나 윈도우에서 실행해야 합니다.
+
+윈도우에서는 cmd
+
+맥에서는 쉘
+
+
+
+
+site1.com 도메인과 nginx_1 의 웹서버를 연결
+
+hosts 파일 내용 변경
+192.168.0.34		site1.com
+127.0.0.1		site2.com
+127.0.0.1		site3.com
+127.0.0.1		site4.com
+127.0.0.1		site5.com
+127.0.0.1		site6.com
+192.168.0.34 == 리눅스의 IP
+
+이 IP는 실습자에 따라 다를 수 있습니다.
+
+명령어
+systemctl status nginx
+
+더 이상 도커호스트(CentOS9)에 직접설치한 nginx 는 사용하고 싶지 않음
+
+systemctl stop nginx
+
+nginx 종료
+
+systemctl disable nginx
+
+재부팅 되어도 자동으로 nginx 실행되지 않도록 처리
+
+docker rm -f $(docker ps -a -q)
+
+docker run -d --name=nginx_1 --restart="always" -p 80:80 nginx
+
+--restart="always"
+
+도커호스트(CentOS9)가 재부팅 시 자동으로 다시 시작하도록
+
+재부팅 되어도 도커컨테이너 내부의 파일은 유지됩니다.
+
+다 날아가는게 아닙니다. 걱정마세요.
+
+크롬 : http://site1.com
+
+과정설명 시작
+
+윈도우에서 hosts 파일에게 혹시 site1.com 의 IP를 아느냐고 물어봄
+
+hosts 파일에 site1.com 의 IP가 192.168.0.34 라고 적혀있음
+
+192.168.0.34 로 HTTP 요청을 보냅
+
+192.168.0.34 는 도커호스트(CentOS9)의 IP 이기 때문에 CentOS9의 80포트로 연결됨
+
+80포트는 특정 도커게스트(nginx_1)의 80포트와 완결되어 있음
+
+nginx_1의 80포트와 연결되어 있는 nginx 데몬(프로세스, 실행중인 프로그램)에게 요청이 전달됨
+
+nginx 가 응답을 생성하여 브라우저에게 전달
+
+응답자(윈도우 크롬)를 찾는과정도 비슷하다.
+
+
+
+
+
+ 도커 컨테이너 내부에서 저장한 파일은 영속합니다.
+
+명령어
+docker exec -it nginx_1 bash
+
+echo "HI" > aaaa
+
+도커 컨테이너 내부에서 aaaa 파일생성
+
+exit
+
+updatedb
+
+locate aaaa
+
+cat 으로 파일 내용 출력해서 HI 가 나오는지 확인
+
+reboot now
+
+재부팅을 해도 파일이 유지되는지 확인하기 위해서 수행
+
+도커호스트(CentOS9)가 재부팅이 될때까지 기다림
+
+ssh root@192.168.0.34
+
+root 계정으로 192.168.0.34 라는 PC에 SSH 접속을한다.
+
+locate aaaa
+
+cat 으로 파일 내용 출력해서 HI 가 나오는지 확인
+
+이로써 재부팅이 되어도 파일이 유지된다는것을 확인
+
+
+
+볼륨을 잡으면 설령 컨테이너가 삭제되어도 해당 폴더의 내용은 유지됩니다.
+
+명령어
+mkdir -p /docker_projects/nginx_1/volumes/usr/share/nginx/html
+
+위 디렉토리는 강사가 임의로 정한 것 입니다.
+
+docker_projects : 도커 컨테이너들
+
+docker_projects/nginx_1 : 특정 컨테이너
+
+docker_projects/nginx_1/volumes : 특정 컨테이너와 관련된 볼륨들
+
+docker_projects/nginx_1/volumes/usr/share/nginx/html : nginx_1 컨테이너 내부에 /usr/share/nginx/html 폴더에 대한 볼륨
+
+docker rm -f nginx_1
+
+기존 nginx_1 컨테이너 삭제
+
+docker run \
+	--name=nginx_1 \
+	-p 80:80 \
+	-v /docker_projects/nginx_1/volumes/usr/share/nginx/html:/usr/share/nginx/html \
+	-d \
+	--restart="always" \
+	nginx
+/docker_projects/nginx_1/volumes/usr/share/nginx/html:/usr/share/nginx/html 에 대한 설명
+
+호스트폴더경로:게스트폴더경로
+
+이렇게 하면 원래 만들어졌어야 할 내부 파일들이 생성되지 않는다.
+
+원래 만들어졌어야 할 파일 : index.html 기타 등등
+
+크롬 : http://site1.com
+
+403 or 404
+
+cd /docker_projects/nginx_1/volumes/usr/share/nginx/html
+
+echo "<h1 style='color:blue;'>Hello</h1>" > index.html
+크롬 : http://site1.com
+
+잘 나온다.
+
+docker rm -f nginx_1
+
+이렇게 지워도 볼륨으로 연결한 폴더안의 내용은 유지된다.
+
+docker run \
+	--name=nginx_1 \
+	-p 80:80 \
+	-v /docker_projects/nginx_1/volumes/usr/share/nginx/html:/usr/share/nginx/html \
+	-d \
+	--restart="always" \
+	nginx
+크롬 : http://site1.com
+
+이제서야 잘 나온다.
+
+볼륨을 설정 유무에 따른 작업방식 차이
+볼륨 없을 때
+docker exec -it nginx_1 bash # 도커 컨테이너 안으러 접속
+cd /usr/share/nginx/html
+echo "<h1 style='color:blue;'>Hello</h1>" > index.html
+exit # 빠져나옴
+백업필요여부 : 도커 컨테이너를 삭제하기 전에 해당 폴더의 내용을 백업해야 함
+
+볼륨 있을 때
+cd /docker_projects/nginx_1/volumes/usr/share/nginx/html
+echo "<h1 style='color:blue;'>Hello</h1>" > index.html
+백업필요여부 : 도커 컨테이너를 삭제하기 전에 해당 폴더의 내용을 백업할 필요가 없음
+
+
+
+nginx 이미지를 기반으로, nginx_custom_1 커스텀 이미지 생성
+
+nginx_custom_1 이미지 프로젝트 폴더, 재료(소스코드, index.html 등) 생성
+mkdir -p /docker_projects/nginx_1/project
+
+cd /docker_projects/nginx_1/project
+
+echo '<h1 style="color: blue">Hello Nginx</h1>' > index.html
+cat index.html
+
+nginx_custom_1 이미지 생성을 위한 레시피(Dockerfile) 생성
+vim Dockerfile
+
+# 베이스 이미지
+FROM nginx
+
+# 도커 컨테이너 내부의 디렉토리 이동
+WORKDIR /usr/share/nginx/html
+
+# 호스트 폴더(./) 의 내용을 /usr/share/nginx/html 폴더로 이동한다.
+# 기존의 index.html 이 지워지고 우리가 만든 재료(index.html)가 저장된다.
+COPY ./ ./
+
+# 하는 편이 좋다. 이 컨테이너는 80을 사용한다는 뜻
+EXPOSE 80
+여기까지가 레시피 생성 완료
+
+nginx_custom_1 이미지 생성
+docker build -t nginx_custom_1 .
+
+docker images
+
+기존 nginx_1 컨테이너의 흔적 제거
+docker rm -f nginx_1
+
+기존 도커 컨테이너 삭제
+
+rm -rf /docker_projects/nginx_1/volumes
+
+이제 더 이상 볼륨필요없음
+
+물론 index.html 파일을 계속 수정할 생각이라면 볼륨을 잡아도 괜찮음
+
+하지만 여기서는 index.html 을 더 이상 수정하지 않는다고 가정
+
+주의사항 : 이미지를 직접만든다고 해서 볼륨을 안써도 되는것은 아닙니다.
+
+다만 지금과 같은 경우는 index.html 파일내용의 수정이 필요할 경우, 새 도커 이미지를 받아서 실행하는 방식으로 하는것이 업계표준방식이라서 볼륨을 지웠습니다.
+
+nginx_1 컨테이너 다시 실행(이번에는 nginx_custom_1 이미지로)
+docker run \
+	--name=nginx_1 \
+	-p 80:80 \
+	-d \
+	--restart="always" \
+	nginx_custom_1
+크롬 : http://site1.com
+
+잘 나온다.
+
+
+
+
+node_hello_1 이미지 프로젝트 폴더 생성
+mkdir -p /docker_projects/node_hello_1/project
+
+cd /docker_projects/node_hello_1/project
+
+재료(소스코드)생성
+vim index.js
+
+const express = require("express");
+
+const port = "8080";
+
+const app = express();
+
+app.get("/", (req, res) => {
+  res.send("Hello Node");
+});
+
+app.listen(port);
+console.log(`server running on ${port}`);
+재료(package.json, 의존성)생성
+vim package.json
+
+{
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
+Dockerfile 생성
+vim Dockerfile
+
+# 최신 node 이미지로 부터 시작
+FROM node
+
+# Working Directory 지정
+# 도커 컨테이너의 작업폴더를 지정
+WORKDIR /usr/src/app
+
+# COPY package.json ./
+# 앞의 ./는 HOST OS의 현재 폴더를 의미
+# 뒤의 ./는 컨테이너의 현재 폴더(WORKDIR)를 의미
+# 즉 외부에서 만들어둔 package.json 파일을 컨테이너 내부로 복사하겠다는 의미
+COPY ./ ./
+
+# node의 종속성 다운로드
+# RUN 명령어는 컨테이너에서 실행
+RUN npm install
+
+# 안해도 되지만, 하는게 좋습니다.
+# 이 컨테이너는 8080 포트를 사용한다는 의미 입니다.
+# 일종의 광고
+EXPOSE 8080
+
+# docker run 명령에서 실행항 명령이, 이 명령어 부터는 제작타임이 아닌 런타임에서 실행됨
+CMD ["node", "index.js"]
+도커이미지 생성
+docker build -t node_hello_1 .
+
+생성된 도커이미지 확인
+docker images
+
+node_hello_1 확인
+
+node:latest 도 확인됨
+
+이미지 제작과정에서 다운로드 됨
+
+node_hello_1 실행
+docker run \
+    --name=node_1 \
+    -p 8080:8080 \
+    --rm \
+    -d \
+    node_hello_1
+만약에 잘 안된다면
+
+sudo systemctl restart docker
+
+이 명령어 실행 후 다시시도
+
+크롬에서 확인
+크롬 : http://site1.com:8080
+
+잘 나온다.
+
+
+
+ 기존 이미지 삭제 후 도커허브에 업로드된 이미지를 받아서 실행
+
+도커허브 가입
+도커허브 - https://hub.docker.com/
+
+도커허브 - 가입 - https://hub.docker.com/signup
+
+리눅스에서 도커로그인
+docker login
+
+아이디와 비번 입력
+
+이메일 말고 아이디를 입력해주세요.
+
+도커 태그기능을 이용해서 기존의 이미지에 대한 새 이름의 레퍼런스 생성
+docker tag 기존이미지명 도커아이디/이미지이름:버전
+
+EX : docker tag node_hello_1 jangka512/node_hello_1:1
+
+도커허브에 도커이미지 푸시
+docker push 도커아이디/이미지이름:버전
+
+docker push jangka512/node_hello_1:1
+
+도커허브에서 확인
+https://hub.docker.com/repository/docker/도커아이디/이미지이름
+
+https://hub.docker.com/repository/docker/jangka512/node_hello_1
+
+기존 이미지 삭제 후 도커허브에 업로드된 이미지를 받아서 실행
+docker rm -f node_1
+docker rmi -f node_hello_1
+docker rmi -f jangka512/node_hello_1:1
+
+docker run \
+    --name=node_1 \
+    -p 8080:8080 \
+    --rm \
+    -d \
+    jangka512/node_hello_1:1
+MAC M1 에서는 안됩니다
+
+MAC M1 사용자는 본인 이미지를 업로드 후 사용해보세요.
+
+크롬 : http://site1.com:8080
+
+잘 나온다.
+
+
+
+
+도커관련 최초상태로 회귀하는 명령어 스크립트
+# 컨테이너 삭제
+docker rm -f $(docker ps -qa)
+
+# 이미지 삭제
+docker rmi -f $(docker images -qa)
+
+# 안쓰는 네트워크 삭제
+docker network prune -f
+
+# 안쓰는 볼륨 삭제
+docker volume prune -f
+도커 관련 프로젝트까지 삭제
+rm -rf /docker_projects
+
+
+
+nginx 하나로 여러개의 사이트를 운영하는 방법, 포트기반 vhost
+
+명령어
+systemctl start nginx
+
+nginx 다시 켜기
+
+vim /etc/nginx/nginx.conf
+
+include /etc/nginx/conf.d/*.conf; 코드 확인
+
+vim /etc/nginx/conf.d/vhost.conf
+
+
+
+내용
+
+server {
+    listen 8021;
+    root /web/site1;
+}
+
+server {
+    listen 8022;
+    root /web/site2;
+}
+
+server {
+    listen 8023;
+    root /web/site3;
+}
+설명
+
+8021 포트 => /web/site1
+
+8022 포트 => /web/site2
+
+8023 포트 => /web/site3
+
+nginx 설정파일에 대해서 변경사항 적용
+
+systemctl reload nginx
+
+설정파일만 새로 반영
+
+systemctl restart nginx
+
+이것도 가능
+
+포트를 바인딩 하는지 확인
+
+netstat -nlp | fgrep nginx
+
+사이트 1 생성
+
+mkdir -p /web/site1
+
+echo "<h1>SITE1</h1>" > /web/site1/index.html
+
+리눅스에서 확인 : curl 127.0.0.1:8021
+
+크롬 : http://site1.com:8021
+
+사이트 2 생성
+
+mkdir -p /web/site2
+
+echo "<h1>SITE2</h1>" > /web/site2/index.html
+
+리눅스에서 확인 : curl 127.0.0.1:8022
+
+크롬 : http://site1.com:8022
+
+사이트 3 생성
+
+mkdir -p /web/site3
+
+echo "<h1>SITE3</h1>" > /web/site3/index.html
+
+echo "<h1>SITE3 sub</h1>" > /web/site3/sub.html
+
+리눅스에서 확인 : curl 127.0.0.1:8023
+
+리눅스에서 확인 : curl 127.0.0.1:8023/sub.html
+
+크롬 : http://site1.com:8023
+
+크롬 : http://site1.com:8023/sub.html
+
+
+
+도메인 기반 vhost
+
+hosts 파일 내용 변경
+192.168.0.34		site1.com
+192.168.0.34		site2.com
+192.168.0.34		site3.com
+192.168.0.34		site4.com
+192.168.0.34		site5.com
+192.168.0.34		site6.com
+명령어
+vim /etc/nginx/conf.d/vhost.conf
+
+server {
+    listen 80; # 포트가 80은 생략가능
+    server_name site1.com;
+    root /web/site1;
+}
+
+server {
+    server_name site2.com;
+    root /web/site2;
+}
+
+server {
+    server_name site3.com;
+    root /web/site3;
+}
+vim /etc/hosts
+
+리눅스에서도 도메인 처리
+
+도메인이 없는자의 설움
+
+127.0.0.1		site1.com
+127.0.0.1		site2.com
+127.0.0.1		site3.com
+127.0.0.1		site4.com
+127.0.0.1		site5.com
+127.0.0.1		site6.com
+설명
+
+site1.com => /web/site1
+
+site2.com => /web/site2
+
+site3.com => /web/site3
+
+nginx 설정파일에 대해서 변경사항 적용
+
+systemctl reload nginx
+
+포트를 바인딩 하는지 확인
+
+netstat -nlp | fgrep nginx
+
+사이트 1 접속
+
+리눅스에서 확인 : curl site1.com
+
+크롬 : http://site1.com
+
+사이트 2 접속
+
+리눅스에서 확인 : curl site2.com
+
+크롬 : http://site2.com
+
+사이트 3 접속
+
+리눅스에서 확인 : curl site3.com
+
+리눅스에서 확인 : curl site3.com/sub.html
+
+크롬 : http://site3.com
+
+크롬 : http://site3.com/sub.html
+
+
+
+node_hello_1 이미지를 8080 으로 실행 후 nginx를 통해서 특정 도메인과 연결
+
+node_hello_1 이미지 실행
+cd /docker_projects/node_hello_1/project
+
+docker run \
+    --name=node_1 \
+    -p 8080:8080 \
+    --rm \
+    -d \
+    node_hello_1
+명령어
+vim /etc/nginx/conf.d/vhost.conf
+
+...
+
+server {
+    server_name site4.com;
+
+    location / {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+nginx 설정파일에 대해서 변경사항 적용
+
+systemctl reload nginx
+
+사이트 4 접속
+
+리눅스에서 확인 : curl site4.com
+
+크롬 : http://site4.com
+
+
+
+node_hello_1 이미지를 8081 로 하나 더 실행하여 nginx를 통해서 특정 도메인과 연결
+
+node_hello_1 이미지 실행
+docker run \
+    --name=node_2 \
+    -p 8081:8080 \
+    --rm \
+    -d \
+    node_hello_1
+명령어
+vim /etc/nginx/conf.d/vhost.conf
+
+...
+
+server {
+    server_name site4.com;
+
+    location / {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+
+server {
+    server_name site5.com;
+
+    location / {
+        proxy_pass http://127.0.0.1:8081;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+nginx 설정파일에 대해서 변경사항 적용
+
+systemctl reload nginx
+
+사이트 5 접속
+
+리눅스에서 확인 : curl site5.com
+
+크롬 : http://site5.com
+
+
+
+ NGINX PROXY MANAGER 의 매핑정보를 저장하기 위해, 또 서비스 운영을 위해 
+
+ MariaDB 최신버전 설치 및 세팅, 외부 관리툴로 접속
+
+MariaDB 최신 이미지 실행
+# 컨테이너 실행
+docker run \
+  --name mariadb_1 \
+  -d \
+  --restart unless-stopped \
+  -e MARIADB_ROOT_PASSWORD=lldj123414 \
+  -e TZ=Asia/Seoul \
+  -p 3306:3306 \
+  -v /docker_projects/mariadb_1/conf.d:/etc/mysql/conf.d \
+  -v /docker_projects/mariadb_1/mysql:/var/lib/mysql \
+  -v /docker_projects/mariadb_1/run/mysqld:/run/mysqld/ \
+  mariadb:latest
+보안설정
+docker exec -it mariadb_1 /usr/bin/mariadb-secure-installation
+
+Enter current password for root (enter for none):
+
+root 계정 패스워드(lldj123414) 입력
+
+Switch to unix_socket authentication [Y/n] n
+
+Change the root password? [Y/n] n
+
+나머지 Y
+
+마스터계정(lldj 생성) 및 DB 생성
+docker exec -it mariadb_1 mysql -u root -p
+
+GRANT ALL PRIVILEGES ON *.* TO lldj@'%' IDENTIFIED BY 'lldj123414';
+
+# lldj 계정이 아이디와 비번만 알면 어디서든 접속이 가능하도록 설정
+
+GRANT ALL PRIVILEGES ON *.* TO lldjlocal@127.0.0.1 IDENTIFIED BY '1234';
+
+# lldjlocal 계정이 MariaDB 컨테이너에서만 접속 가능하도록 허용
+
+GRANT ALL PRIVILEGES ON *.* TO lldjlocal@'172.17.%.%' IDENTIFIED BY '1234';
+
+# lldjlocal 계정이 같은 도커 호스트를 공유하는 컨테이너에서 접속 가능하도록 허용
+
+CREATE DATABASE nginx;
+
+# NGINX PROXY MANAGER 를 위함
+
+exit
+
+외부 MySQL 관리 툴로 접속
+접속명 : lldj@PC1
+
+이 이름은 기억하기 쉽도록
+
+HOST : site1.com
+
+ID : lldj
+
+PW : lldj123414
+
+PORT : 3306
+
+Mysql Workbench 접속 에러 ssl connection 해결법
+img
+
+
+
+문제가 생겼을 때 VB의 회귀기능을 이용해서 해결하는 방법
+
+방법
+VB의 기능을 이용해서 과거로 회귀
+
+
+
+selinux 끄기 및 비활성화
+
+firewalld 끄기 및 비활성화
+
+
+nginx 끄기 및 비활성화
+
+
+
+도커컴포즈는 관련된 docker run 명령을 모아서 한방에 실행을 시켜주는 방법을 제공하는 도구이다.
+
+composerize
+https://www.composerize.com/
+
+도커 run 명령어를 docker-compose.yml 형식으로 변환해주는 온라인 툴
+
+도커 실행 명령어와 docker-compose 문법 비교
+이 명령어와
+docker run -p 80:80 -v /var/run/docker.sock:/tmp/docker.sock:ro --restart always --log-opt max-size=1g nginx
+이 compose 의 내용은 같다.
+version: '3.3'
+services:
+    nginx:
+        ports:
+            - '80:80'
+        volumes:
+            - '/var/run/docker.sock:/tmp/docker.sock:ro'
+        restart: always
+        logging:
+            options:
+                max-size: 1g
+        image: nginx
+62강
+23 04 21, ken 12206, 62강, 도커컴포즈로 nginx proxy manager 1부, 설치
+
+23 04 21, ken 12206, 62강, 도커컴포즈로 nginx proxy manager 2부, 콘솔접속, 이 툴을 왜 써야하는지 설명
+
+디렉토리 생성
+mkdir -p /docker_projects/nginx_proxy_manager_1
+
+cd /docker_projects/nginx_proxy_manager_1
+
+docker-compose.yml 생성
+vim docker-compose.yml
+
+version: "3"
+services:
+  app:
+    image: 'jc21/nginx-proxy-manager:latest'
+    restart: unless-stopped
+    ports:
+      - '80:80' # Public HTTP Port
+      - '443:443' # Public HTTPS Port
+      - '81:81' # Admin Web Port
+    environment:
+      TZ: "Asia/Seoul"
+      DB_MYSQL_HOST: "172.17.0.1"
+      DB_MYSQL_PORT: 3306
+      DB_MYSQL_USER: "lldjlocal"
+      DB_MYSQL_PASSWORD: "1234"
+      DB_MYSQL_NAME: "nginx"
+    volumes:
+      - ./data:/data
+      - ./letsencrypt:/etc/letsencrypt
+DB 생성
+docker exec -it mariadb_1 mysql -u root -plldj123414
+
+CREATE DATABASE nginx;
+
+exit
+
+실행
+docker compose up -d
+
+종료는 : docker compose down
+
+관리 콘솔 접속
+크롬 : http://site1.com:81
+
+크롬에서 확인
+
+임시 관리자 계정
+
+admin@example.com
+
+changeme
+
+관리 콘솔 접속 후 관리자 계정정보 변경
+이메일 변경
+
+본인이 사용하는 이메일로 변경
+
+비밀번호 변경
+
+lldj123414
+
+
+
+NPM 에게 앞으로 site2.com 도메인으로 요청이 오면, 그 요청을 172.17.0.1:8021 로 토스하라고 학습시킴
+
+node_hello_1 이미지를 실행, 8021 에 대해서 포트포워딩, 이제는 site2.com 으로 접속시 연결됩니다.
+
+node_hello_1 이미지 생성
+
+node_hello_1 이미지 생성
+
+node_hello_1 실행
+docker run \
+    --name=node_1 \
+    -p 8021:8080 \
+    --rm \
+    -d \
+    node_hello_1
+크롬 접속
+크롬 : http://site2.com
+
+크롬에서 확인
+
+http://192.168.0.34:8021 로 접속했을 때의 요청흐름
+192.168.0.34 는 강사의 리눅스 IP 입니다.
+
+
+http://site2.com 로 접속했을 때의 요청흐름
+
+
+https://start.spring.io/
+
+GITHUB 리포지터리 - https://github.com/jhs512/app20220916_2
+
+
+
+
+ git, java-17-openjdk 설치, 프로젝트를 clone
+
+git 설치
+yum install git -y
+
+java-17-openjdk 설치
+yum install java-17-openjdk -y
+
+만약에 yum 다운로드 속도가 많이 느리다면
+
+Ctrl + C
+
+후
+
+다시 시도
+
+yum install java-17-openjdk-devel -y
+
+프로젝트 폴더 생성 및 이동
+rm -rf /docker_projects/sbhello_1/project
+
+mkdir -p /docker_projects/sbhello_1/project
+
+cd /docker_projects/sbhello_1/project
+
+git pull, 방법 1
+git init
+
+git remote add origin https://github.com/jhs512/app20220916_2
+
+git pull origin master
+
+git pull, 방법 2
+git clone https://github.com/jhs512/app20220916_2 .
+
+
+ 빌드하여 jar 파일 생성 후 실행
+
+gradlew 를 소유자가 실행 가능한 상태로 변경
+ls -alh | fgrep gradlew
+
+chmod 744 gradlew
+
+ls -alh | fgrep gradlew
+
+빌드
+./gradlew clean build
+
+안되면 현재시간을 맞추고 다시 시도
+
+date -s "YYYY-MM-DD HH:II:SS"
+
+EX : date -s "2023-04-24 16:58:00"
+
+실행
+java -jar -Dspring.profiles.active=prod build/libs/app20220916-0.0.1-SNAPSHOT.jar
+
+CTRL + C 로 종료
+
+http://192.168.0.34:8080/
+크롬에서 확인
+
+http://192.168.0.34:8080/ 로 접속했을 때의 요청흐름
+
+ sbhello 도커이미지 생성 및 실행
+
+Dockerfile 생성
+vim Dockerfile
+
+# m1 이라면 openjdk:17-jdk-alpine 대신 openjdk:17 사용
+FROM openjdk:17-jdk-alpine
+ARG JAR_FILE=build/libs/app20220916-0.0.1-SNAPSHOT.jar
+COPY ${JAR_FILE} app.jar
+EXPOSE 8080
+ENTRYPOINT ["java","-jar","-Dspring.profiles.active=prod","/app.jar"]
+sbhello 이미지 생성
+docker build -t sbhello .
+
+sbhello 이미지 실행
+docker run \
+  --name=sbhello_1 \
+  -p 8080:8080 \
+  -d \
+  sbhello
+http://192.168.0.34:8080/
+크롬에서 확인
+
+http://192.168.0.34:8080 로 접속했을 때의 요청흐름
+DB 사용하는 스프링부트 프로젝트 생성
+
+GITHUB 리포지터리 - https://github.com/jhs512/app20220916_3
+
+
+빌드하여 jar 파일 생성, 하지만 실패
+
+프로젝트 폴더 생성 및 이동
+rm -rf /docker_projects/sbdb_1/project
+
+mkdir -p /docker_projects/sbdb_1/project
+
+cd /docker_projects/sbdb_1/project
+
+git pull, 방법 1
+git init
+
+git remote add origin https://github.com/jhs512/app20220916_3
+
+git pull origin master
+
+git pull, 방법 2
+git clone https://github.com/jhs512/app20220916_3 .
+
+gradlew 를 소유자가 실행 가능한 상태로 변경
+ls -alh | fgrep gradlew
+
+chmod 744 gradlew
+
+ls -alh | fgrep gradlew
+
+빌드 - FAIL
+./gradlew clean build
+
+실패사유 : DBMS가 없다.
+
+
+
+빌드하여 jar 파일 생성, 환경변수를 재지정 하여 성공
+
+app20220916_2__test DB 생성
+docker exec -it mariadb_1 mysql -u root -plldj123414
+
+CREATE DATABASE app20220916_2__test;
+
+exit
+
+빌드 - OK
+testDbId=lldjlocal testDbPw=1234 ./gradlew clean build
+
+안되면 현재시간을 맞추고 다시 시도
+
+date -s "YYYY-MM-DD HH:II:SS"
+
+EX : date -s "2023-04-24 16:58:00"
+
+application-test.yml 원문
+spring:
+  datasource:
+    url: jdbc:mariadb://${testDbIp:127.0.0.1}:3306/app20220916_2__test?useUnicode=true&characterEncoding=utf8&autoReconnect=true&serverTimezone=Asia/Seoul
+    username: ${testDbId:root}
+    password: ${testDbPw:}
+  jpa:
+    hibernate:
+      ddl-auto: create
+application-test.yml : ./gradlew clean build
+spring:
+  datasource:
+    url: jdbc:mariadb://127.0.0.1:3306/app20220916_2__test?useUnicode=true&characterEncoding=utf8&autoReconnect=true&serverTimezone=Asia/Seoul
+    username: root
+    password: 
+  jpa:
+    hibernate:
+      ddl-auto: create
+application-test.yml : testDbId=lldjlocal testDbPw=1234 ./gradlew clean build
+spring:
+  datasource:
+    url: jdbc:mariadb://127.0.0.1:3306/app20220916_2__test?useUnicode=true&characterEncoding=utf8&autoReconnect=true&serverTimezone=Asia/Seoul
+    username: lldjlocal
+    password: 1234
+  jpa:
+    hibernate:
+      ddl-auto: create
+
+
+테스트는 개발환경에서는 물론 운영환경에서도 실행되어야 한다, 테스트에 메모리DB를 사용하면 이 문제가 간단해짐
+
+
+
+sbdb 도커이미지 생성 및 실행
+
+테스트용 DB, 운영 DB 생성
+docker exec -it mariadb_1 mysql -u root -plldj123414
+
+DROP DATABASE IF EXISTS app20220916_2;
+CREATE DATABASE app20220916_2;
+
+USE app20220916_2;
+
+CREATE TABLE `article` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `subject` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+);
+
+insert  into `article`(`id`,`subject`) values 
+(1,'제목1'),
+(2,'제목2');
+
+exit;
+Dockerfile 생성
+vim Dockerfile
+
+# m1 이라면 openjdk:17-jdk-alpine 대신 openjdk:17 사용
+FROM openjdk:17-jdk-alpine
+ARG JAR_FILE=build/libs/app20220916-0.0.1-SNAPSHOT.jar
+COPY ${JAR_FILE} app.jar
+EXPOSE 8080
+ENTRYPOINT ["java","-jar","-Dspring.profiles.active=prod","/app.jar"]
+sbdb 이미지 생성
+docker build -t sbdb .
+
+sbdb 이미지 실행 - OK
+docker run \
+  --name=sbdb_1 \
+  -p 8081:8080 \
+  -d \
+  sbdb
+http://192.168.0.34:8081/
+크롬에서 확인
+
+http://192.168.0.34:8081/ 로 접속했을 때의 요청흐름
+
+http://192.168.0.34:8081/article/getList
+크롬에서 확인
+
+http://192.168.0.34:8081/article/getList 로 접속했을 때의 요청흐름
