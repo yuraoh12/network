@@ -1,0 +1,44 @@
+[L3 Switch]
+Switch(config)#inter range f0/4-5
+Switch(config-if-range)#channel-protocol lacp
+Switch(config-if-range)#channel-group 1 mode active
+Switch(config-if-range)#inter po 1
+Switch(config-if)#sw tr en dot1q
+Switch(config-if)#sw mo tr
+Switch(config-if)#inter range f0/2-3
+Switch(config-if-range)#channel-protocol pagp
+Switch(config-if-range)#channel-group 2 mode desirable
+Switch(config-if-range)#inter po 2
+Switch(config-if)#sw tr en dot1q
+Switch(config-if)#sw mo tr
+
+Switch(config)#vtp mode server
+Device mode already VTP SERVER.
+Switch(config)#vtp domain korea
+Changing VTP domain name from NULL to korea
+Switch(config)#vtp password 1234
+Setting device VLAN database password to 1234
+Switch(config)#vlan 10
+Switch(config-vlan)#vlan 20
+Switch(config-vlan)#vlan 30
+
+[SW4]
+Switch(config)#inter range f0/1-2
+Switch(config-if-range)#channel-protocol pagp
+Switch(config-if-range)#channel-group 2 mode desirable
+Switch(config-if-range)#inter po 2
+Switch(config-if)#sw mo tr
+Switch(config-if)#inter range f0/3-4
+Switch(config-if-range)#channel-protocol pagp
+Switch(config-if-range)#channel-group 3 mode desirable 
+Switch(config-if-range)#inter po 3
+Switch(config-if)#sw mo tr
+Switch(config)#vtp mode client
+Setting device to VTP CLIENT mode.
+Switch(config)#vtp domain korea
+Domain name already set to korea.
+Switch(config)#vtp password 1234
+Setting device VLAN database password to 1234
+
+
+
