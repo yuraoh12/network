@@ -1,0 +1,6 @@
+Dynamic : 접근순으로 mac주소 학습(running-config저장 x)
+Static : 미리 mac를 지정 (running-config저장 o)
+Sticky : Dynamic + Static
+접근순으로 mac주소 학습 + running-config저장 o
+
+copy running-config startup-config

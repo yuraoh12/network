@@ -1,0 +1,5 @@
+Server : VLAN 생성/수정/삭제 o , VLAN 전달 o
+
+Client : VLAN 생성/수정/삭제 x , VLAN 전달 o , VLAN 적용 o
+
+Transparent : VLAN 생성/수정/삭제 o, VLAN 전달 o(서버로받은), VLAN 적용 x(서버로 받은)

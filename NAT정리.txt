@@ -1,0 +1,14 @@
+NAT : 주소 		해결 프로토콜
+      사설IP -> 공인IP
+      IPv4 주소고갈->사설대역(중복IP허용) - WAN과 사설LAN 차단(Not Routing)
+      내부(사설대역) -> 외부 허용 -> NAT기술사용
+------------------
+DNAT : N : M(공인IP개수만큼 통신) - 외부->내부(x) 
+SNAT : 1 : 1  - 외부->내부(o -지정된 공인IP로만 접근)
+PAT  : N : M(상관x) - 외부->내부(x)
+
+사설대역 access-list 10 permit 192.168.10.0 0.0.0.255
+공인대역 ip nat pool DNAT 1.1.12.100 1.1.12.200 netmask 255.255.255.0
+매핑 ip nat inside source list 10 pool DNAT
+적용 int f0/0 -> ip nat inside | int s0/0 -> ip nat outside
+

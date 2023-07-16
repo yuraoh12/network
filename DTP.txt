@@ -1,0 +1,24 @@
+DTP
+
+access			: 현재포트는 Access , DTP x
+trunk			: 현재포트는 Trunk , DTP 송신/수신 o
+Dynamic Desirable	: 상대포트에 따라 결정 , DTP 송신/수신 o
+Dynamic Auto		: 상대포트에 따라 결정 , DTP 수신 o
+--------------------------------------------------------------
+a - a => access mode
+t - t => trunk mode
+a - t => 통신 x
+
+a - DD=> access mode
+a - DA=> access mode
+t - DD=> trunk mode
+t - DA=> trunk mode
+
+DD-DD => trunk mode
+DD-DA => trunk mode
+DA-DA => access mode
+
+
+
+
+
