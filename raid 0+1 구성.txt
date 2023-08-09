@@ -1,0 +1,32 @@
+raid 0+1 구성 
+
+mdadm --create /dev/md0 --level=0 --raid-devices=2 /dev/sdc1 /dev/sdd1
+mdadm --create /dev/md1 --level=0 --raid-devices=2 /dev/sde1 /dev/sdf1
+mdadm --create /dev/md2 --level=1 --raid-devices=2 /dev/md0 /dev/md1
+ls -l /dev/md*
+fdisk -l /dev/md2
+mdadm --detail --scan -v
+cat /proc/mdstat
+mkfs -t ext4 /dev/md2 > /dev/null
+mkdir /mnt/raid2
+mount /dev/md2 /mnt/raid2
+df -h
+
+--------------------------------------------------------------------------------------------------
+
+umount /dev/md2
+df -h
+rm -rf /mnt/raid2
+mdadm --stop /dev/md2
+mdadm --stop /dev/md1
+mdadm --stop /dev/md0
+
+
+cat /proc/mdstat
+mdadm --zero-superblock /dev/sdc1 /dev/sdd1 /dev/sde1 /dev/sdf1
+mdadm --examine /dev/sdc1 /dev/sdd1 /dev/sde1 /dev/sdf1
+ls -l /dev/md*
+
+
+
+
