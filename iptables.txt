@@ -48,3 +48,49 @@ iptables -L INPUT --line-numbers
 
 iptables -D INPUT 4
 iptables -L INPUT --line-numbers 
+
+룰 제어문
+ACCEPT DROP REJECT LOG
+
+테스트 하기 위한 패키지 설치
+
+1) server1에서 다음과 같은 패키지를 설치하고 서비스를 활성화한다. 
+yum -y install telnet-server telnet vsftpd nfs-utills samba samba-client cifs-utills 
+yum -y install mariadb-server httpd mod_ssl bind
+systemctl enable --now telnet.socket vsftpd nfs-server smb nmb mariadb httpd named
+
+2) server2에서 다음과 같은 패키지를 설치하고 서비스를 활성화한다. 
+yum -y install telnet-server telnet bind sendmail dovecot
+systemctl enable --now telnet.socket named sendmail dovecot
+
+3) client1, client2에서 nmap 및 telnet을 설치한다.
+yum -y install nmap telnet-server telnet
+
+4) 설치가 완료되었다면 client1에서 server1을 스캔하여 활성화된 포트 및 서비스를 확인한다
+nmap -sS -sV 192.168.2.200
+
+nmap -sU -p 53,137,138 192.168.2.200 (udp)
+
+iptables 방화벽을 이용한 필터링 구성
+iptables -P INPUT DROP
+iptables -L INPUT
+
+nmap -sS -sV 192.168.2.200 (ssh만 open)
+nmap -sU -p 53,137,138 192.168.2.200 (filtered)
+
+localhost(loopback)
+iptables -A INPUT -i lo -j ACCEPT (loopback 입력되는 interface로 오는걸 다 허용)
+iptables -L INPUT -v
+ping 127.0.0.1
+telnet 127.0.0.1
+ssh root@127.0.0.1
+
+nmap -sU -p 53 192.168.2.200
+cat /etc/resolv.conf
+
+iptables -A INPUT -p upd --dport 53 -j ACCEPT (추가)
+iptables -L INPUT -v
+
+iptables -A INPUT -p udp --sport 53 -j ACCEPT (추가)
+iptables -L INPUT -v
+
