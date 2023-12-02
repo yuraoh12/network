@@ -1,0 +1,50 @@
+systemctl restart iptables
+systemctl disable --now iptables
+iptables -L
+systemctl status iptables
+
+iptables 체인
+INPUT, FORWARD, OUTPUT
+
+iptables -A INPUT -p tcp --dport 22 -j ACCEPT
+iptables -L -v
+rpm -ql iptables-services
+service iptables save
+cat /etc/sysconfig/iptables
+
+systemctl restart iptables (파일을 저장한걸 안끊기고 가져옴)
+iptables -L
+iptables -L INPUT
+iptables -X TEST
+
+iptables -P INPUT DROP (POLICY DROP 변환,  ssh허용하고 나머지 다 드랍)
+iptables -L
+
+ping -c 5 192.168.2.200
+
+iptables -A INPUT -p icmp -j DROP
+iptables -L
+iptables -F INPUT
+
+sytemctl  restart iptables
+iptables -L
+cat /etc/sysconfig/iptables (원상복구가 됨)
+
+iptables -A INPUT -p tcp --dport 80 -j ACCEPT
+iptables -A INPUT -p tcp --dport 23 -j ACCEPT
+iptables -L
+
+iptables -L INPUT
+
+iptables -L INPUT --line-numbers (순서대로 검사한다.)
+
+iptables -I INPUT -p tcp --dport 21 -j ACCEPT (ftp)
+iptables -L INPUT --line-numbers 
+iptables -I INPUT 2 -p tcp --dport 443 -j ACCEPT (https)
+iptables -L INPUT --line-numbers 
+
+iptables -D INPUT -p tcp --dport 23 -j ACCEPT
+iptables -L INPUT --line-numbers 
+
+iptables -D INPUT 4
+iptables -L INPUT --line-numbers 
